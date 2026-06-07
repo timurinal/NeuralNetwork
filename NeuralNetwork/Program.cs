@@ -42,7 +42,7 @@ class Program
             for (int i = 0; i < batchSize; i++)
             {
                 inputs[i][0] = rng.RandRadians();
-                targets[i][0] = Math.Sin(inputs[i][0]);
+                targets[i][0] = Math.Sin(inputs[i][0]) * Math.Cos(2 * inputs[i][0]);
             }
             nn.Train(inputs, targets);
         }
@@ -53,7 +53,7 @@ class Program
         foreach (double x in testPoints)
         {
             double predicted = nn.Forward([x])[0];
-            double actual = Math.Sin(x);
+            double actual = Math.Sin(x) * Math.Cos(2*x);
 
             double error = Math.Abs(predicted - actual);
             double accuracy = Math.Max(0, 1.0 - error) * 100.0;
