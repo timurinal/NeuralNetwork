@@ -49,8 +49,6 @@ public sealed class Network
         _avgGrads = new LayerGradients[Layers.Length];
         for (int i = 0; i < Layers.Length; i++)
             _avgGrads[i] = new LayerGradients(Layers[i].InputLength, Layers[i].OutputLength);
-
-        Console.WriteLine($"Network initialised with {layers.Length} layers. Total neuron count: {layers.Sum()}");
     }
 
     public double[] Forward(double[] input)
@@ -119,6 +117,52 @@ public sealed class Network
             }
 
             Layers[i].ApplyGradients(_avgGrads[i].Weights, _avgGrads[i].Biases, learningRate);
+        }
+    }
+    
+    public void SetWeights(double[][,] weights)
+    {
+        if (weights.Length != Layers.Length)
+            throw new ArgumentException($"Expected {Layers.Length} weights, got {weights.Length}");
+
+        for (int i = 0; i < Layers.Length; i++)
+            Layers[i].SetWeights(weights[i]);
+    }
+
+    public double[][,] GetWeights()
+    {
+        double[][,] result = new double[Layers.Length][,];
+        for (int i = 0; i < Layers.Length; i++)
+            result[i] = Layers[i].GetWeights();
+        return result;
+    }
+    
+    public double[] GetParameters()
+    {
+        int total = Layers.Sum(l => l.InputLength * l.OutputLength + l.OutputLength);
+        double[] result = new double[total];
+        int idx = 0;
+        foreach (var layer in Layers)
+        {
+            for (int i = 0; i < layer.InputLength; i++)
+            for (int j = 0; j < layer.OutputLength; j++)
+                result[idx++] = layer.Weights[i, j];
+            for (int j = 0; j < layer.OutputLength; j++)
+                result[idx++] = layer.Biases[j];
+        }
+        return result;
+    }
+
+    public void SetParameters(double[] parameters)
+    {
+        int idx = 0;
+        foreach (var layer in Layers)
+        {
+            for (int i = 0; i < layer.InputLength; i++)
+            for (int j = 0; j < layer.OutputLength; j++)
+                layer.Weights[i, j] = parameters[idx++];
+            for (int j = 0; j < layer.OutputLength; j++)
+                layer.Biases[j] = parameters[idx++];
         }
     }
 }

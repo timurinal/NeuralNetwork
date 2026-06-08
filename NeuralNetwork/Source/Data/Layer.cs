@@ -80,6 +80,13 @@ public sealed class Layer
             Biases[j] -= lr * (_mB[j] / bc1) / (Math.Sqrt(_vB[j] / bc2) + Eps);
         }
     }
+    
+    public void SetWeights(double[,] weights)
+    {
+        Array.Copy(weights, Weights, weights.Length);
+    }
+    
+    public double[,] GetWeights() => (double[,])Weights.Clone();
 }
 
 public sealed class LayerGradients
